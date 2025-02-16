@@ -2,10 +2,11 @@
 # Date: 17-02-2025
 # Project: D&D Dice Roller
 
-def main():
-    import random
-    import math
+import random
+import math
 
+def main():
+    
     try:
         numSides = float(input("\nHello! How many sides does your dice have?\nYour answer: "))
     except ValueError:
