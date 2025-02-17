@@ -3,46 +3,73 @@
 # Project: D&D Dice Roller
 
 import random
-import math
+import tkinter as tk
+import tkinter.font as tkFont
+from tkinter import *
+from tkinter import ttk
+from tkinter.ttk import *
+from tkinter import messagebox
 
-def main():
-    
+# Main tkinter window/toplevel
+root = tk.Tk()
+root.resizable(False, False)
+root.title("Python D&D Dice Roller")
+
+# Set fonts
+normal_font =  tkFont.Font(family="Arial", size=16, weight=tkFont.NORMAL)
+title_font = tkFont.Font(family="Arial",  size=28, weight=tkFont.BOLD)
+
+# Title label
+title = Label(root, text="Python D&D Dice Roller", font=title_font).grid(columnspan=2, row=0, column=0, padx=50,pady=5)
+
+# Dice side mapping
+dice_sides_map = {"d4": 4, "d6": 6, "d8": 8, "d10": 10, "d12": 12, "d20": 20}
+num_sides = tk.IntVar(value=0)
+
+# Update side dice
+def update_num_sides(event):
+    selection = num_sides_combo.get()
+    num_sides.set(dice_sides_map.get(selection, 0))
+
+# Roll dice
+def roll_dice():
     try:
-        numSides = float(input("\nHello! How many sides does your dice have?\nYour answer: "))
-    except ValueError:
-        numSides = float(input("\nOops! Please use numbers. Try again!\nYour answer: "))
-    except:
-        print("Uh, something went wrong.")
-
-    # Invalid number of sided dice
-    while (numSides != 4 and numSides != 6 and numSides != 8 and numSides != 10 and numSides != 12 and numSides != 20):
-        numSides = float(input("\nPlease enter a valid number of sides.\nYour answer: "))
+        num_dice = int(num_dice_field.get())
+        modifier = int(modifier_field.get())
+        sides = num_sides.get()
     
-    # Number of X-sided dice
-    print(f"\nYou have selected a d{math.trunc(numSides)}!")
-    try:
-        numDice = float(input("\nHow many are you rolling?\nYour answer: "))
+        if num_dice <= 0:
+            messagebox.showwarning("Error", "There must be at least 1 die!")
+            return
+        
+        rolls = [random.randint(1, sides) for _ in range(num_dice)]
+        total = sum(rolls) + modifier
+        result_text = f"Rolls: {rolls}\nTotal (with modifier): {total}"
+
+        messagebox.showinfo("Roll Result", result_text)
+
     except ValueError:
-        print("\nOops! Please type a valid number!")
-        numDice = float(input("\nHow many are you rolling?\nYour answer: "))
-    except:
-        print("Uh, something went wrong.")
+        messagebox.showerror("Error", "Please enter valid numbers.")
 
-    # Confirmation of dice
-    print(f"\nYou are rolling {math.trunc(numDice)}d{math.trunc(numSides)}!")
-    confirm = input("\nConfirm? (Y/N)\nYour answer: ")
+# No. of sides
+Label(root, text="No. of Sides", font=normal_font, justify="left").grid(row=1,column=0,padx=5,pady=10)
+num_sides_combo = ttk.Combobox(root, values=["d4", "d6", "d8", "d10", "d12", "d20"], state="readonly", font=normal_font)
+num_sides_combo.grid(row=1,column=1,padx=0,pady=10)
+num_sides_combo.bind("<<ComboboxSelected>>", update_num_sides)
 
-    while ((confirm != "Y" and confirm  != "y") and (confirm != "N" and confirm !="n")):
-        print("\nUh oh! Please choose between Y for YES or N for NO.")
-        print(f"\nYou are rolling {math.trunc(numDice)}d{math.trunc(numSides)}!")
-        confirm = input("\nConfirm? (Y/N)\nYour answer: ")
+# No. of dice
+Label(root, text="No. of Dice", font=normal_font, justify="left").grid(row=2,column=0,padx=5,pady=10)
+num_dice_field = ttk.Spinbox(root, from_=0, to=999, font=normal_font)
+num_dice_field.grid(row=2, column=1, padx=0, pady=10)
+
+# Any modifiers
+Label(root, text="Modifier", font=normal_font, justify="left").grid(row=3,column=0,padx=5,pady=10)
+modifier_field = ttk.Spinbox(root, from_=-999, to=999, font=normal_font)
+modifier_field.grid(row=3, column=1, padx=0, pady=10)
+
+# Roll button
+roll_button = tk.Button(root, text="Roll",  height=1, width=20, font=normal_font, command=roll_dice)
+roll_button.grid(row=4,columnspan=2, column=0, padx=0, pady=10)
     
-    if confirm == "Y" or confirm == "y":
-        results = int(numDice) * int(random.randint(1, int(numSides)))
-        print(f"\nYou have rolled a: {results}!")
-    elif  confirm == "N" or confirm == "n":
-        print("\nThank you for using D&D Dice Roller!")
-    else:
-        print("Uh, something went wrong.")
-
-main()
+# Start GUI
+root.mainloop()
